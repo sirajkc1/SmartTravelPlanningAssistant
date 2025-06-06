@@ -7,18 +7,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.siraj.smarttravelplanningassistant.ui.theme.SmartTravelPlanningAssistantTheme
 
 class MainActivity : ComponentActivity() {
@@ -35,8 +26,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             SmartTravelPlanningAssistantTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    TestLayout(
-                        name = "Android",
+                    TravelHomePage(
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -46,59 +36,75 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun TestLayout(name: String, modifier: Modifier = Modifier) { // It's good practice to use the passed modifier on the root element
-    Row(
-        modifier = modifier.fillMaxSize() // Apply the passed modifier here
+fun TravelHomePage(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F5F5))
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(modifier = Modifier.fillMaxHeight() // Use a new Modifier for this Column
-            .width(100.dp).background(Color.Yellow),
-            verticalArrangement = Arrangement.SpaceEvenly,
-            horizontalAlignment = Alignment.CenterHorizontally) {
-            repeat(6){
-                val context = LocalContext.current
-                Image(
-                    painter = painterResource(image_ids[it]),
-                    contentDescription = "Dice $it",
-                    // Apply a new clickable modifier to the Image
-                    modifier = Modifier.clickable {
-                        Toast.makeText(context, "Clicked $it", Toast.LENGTH_SHORT).show()
-                    }
-                )
-            }
+        Image(
+            painter = painterResource(R.drawable.travel_concept_with_landmarks),
+            contentDescription = "Travel Cover Image",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+        )
+
+        Text(
+            text = "Smart Travel Assistant",
+            style = MaterialTheme.typography.headlineMedium,
+            color = Color(0xFF1E88E5)
+        )
+
+        Text(
+            text = "Welcome back, Helen!",
+            style = MaterialTheme.typography.bodyLarge,
+            color = Color.DarkGray
+        )
+
+        Button(
+            onClick = {
+                Toast.makeText(context, "Trip Planner Coming Soon", Toast.LENGTH_SHORT).show()
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Plan a New Trip")
         }
-        Column(modifier = Modifier.fillMaxHeight().width(100.dp).background(Color.Red),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "Column 2")
+
+        Button(
+            onClick = {
+                Toast.makeText(context, "Expense Tracker Coming Soon", Toast.LENGTH_SHORT).show()
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Track Expenses")
         }
-        Column(
-            modifier = Modifier.fillMaxHeight().fillMaxWidth().background(Color.Gray),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ){
-            Text(text = "Column 3")
+
+        Button(
+            onClick = {
+                Toast.makeText(context, "Reminders Coming Soon", Toast.LENGTH_SHORT).show()
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Upcoming Reminders")
         }
     }
 }
-// test another screen
-@Composable
-fun TestLoginScreeen(modifier: Modifier = Modifier){
 
+@Composable
+fun TestLoginScreen(modifier: Modifier = Modifier) {
+    // Placeholder for login screen
 }
 
 @Preview(showBackground = true)
 @Composable
-fun TestLayout() {
+fun TravelHomePagePreview() {
     SmartTravelPlanningAssistantTheme {
-        TestLayout("Android")
+        TravelHomePage()
     }
 }
-
-private val image_ids = listOf(
-    R.drawable.dice_1,
-    R.drawable.dice_2,
-    R.drawable.dice_3,
-    R.drawable.dice_4,
-    R.drawable.dice_5,
-    R.drawable.dice_6
-)
