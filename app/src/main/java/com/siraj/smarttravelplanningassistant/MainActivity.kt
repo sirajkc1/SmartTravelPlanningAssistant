@@ -8,6 +8,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,10 +19,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.*
 import com.siraj.smarttravelplanningassistant.ui.theme.SmartTravelPlanningAssistantTheme
 
 class MainActivity : ComponentActivity() {
@@ -30,7 +33,18 @@ class MainActivity : ComponentActivity() {
         setContent {
             SmartTravelPlanningAssistantTheme {
                 val navController = rememberNavController()
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    bottomBar = {
+                        val navBackStackEntry by navController.currentBackStackEntryAsState()
+                        val currentDestination = navBackStackEntry?.destination
+
+                        // Show BottomBar only on main app screens (exclude login/signup)
+                        if (currentDestination?.route in listOf("home", "planTrip", "trackExpenses", "reminders")) {
+                            BottomNavigationBar(navController, currentDestination)
+                        }
+                    }
+                ) { innerPadding ->
                     NavHost(
                         navController = navController,
                         startDestination = "login",
@@ -39,6 +53,9 @@ class MainActivity : ComponentActivity() {
                         composable("login") { LoginPage(navController) }
                         composable("signup") { SignUpPage(navController) }
                         composable("home") { TravelHomePage(navController) }
+                        composable("planTrip") { PlanTripPage(navController) }
+                        composable("trackExpenses") { TrackExpensesPage(navController) }
+                        composable("reminders") { RemindersPage(navController) }
                     }
                 }
             }
@@ -47,11 +64,44 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
+fun BottomNavigationBar(navController: NavHostController, currentDestination: NavDestination?) {
+    val items = listOf(
+        BottomNavItem("Home", "home", Icons.Default.Home),
+        BottomNavItem("Plan Trip", "planTrip", Icons.Default.Map),
+        BottomNavItem("Expenses", "trackExpenses", Icons.Default.AttachMoney),
+        BottomNavItem("Reminders", "reminders", Icons.Default.Notifications)
+    )
+
+    NavigationBar {
+        items.forEach { item ->
+            NavigationBarItem(
+                icon = { Icon(item.icon, contentDescription = item.label) },
+                label = { Text(item.label) },
+                selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
+                onClick = {
+                    navController.navigate(item.route) {
+                        // Pop up to the start destination of the graph to avoid building back stack
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        // Avoid multiple copies of the same destination
+                        launchSingleTop = true
+                        // Restore state when reselecting a previously selected item
+                        restoreState = true
+                    }
+                }
+            )
+        }
+    }
+}
+
+data class BottomNavItem(val label: String, val route: String, val icon: androidx.compose.ui.graphics.vector.ImageVector)
+
+@Composable
 fun LoginPage(navController: NavHostController) {
     val context = LocalContext.current
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-
     val isLoginEnabled = email.isNotBlank() && password.isNotBlank()
 
     Column(
@@ -216,32 +266,7 @@ fun TravelHomePage(navController: NavHostController, modifier: Modifier = Modifi
             color = Color.DarkGray
         )
 
-        Button(
-            onClick = {
-                Toast.makeText(context, "Trip Planner Coming Soon", Toast.LENGTH_SHORT).show()
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Plan a New Trip")
-        }
-
-        Button(
-            onClick = {
-                Toast.makeText(context, "Expense Tracker Coming Soon", Toast.LENGTH_SHORT).show()
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Track Expenses")
-        }
-
-        Button(
-            onClick = {
-                Toast.makeText(context, "Reminders Coming Soon", Toast.LENGTH_SHORT).show()
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Upcoming Reminders")
-        }
+        // Buttons removed here, replaced by BottomNavigationBar
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -254,6 +279,81 @@ fun TravelHomePage(navController: NavHostController, modifier: Modifier = Modifi
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Logout")
+        }
+    }
+}
+
+@Composable
+fun PlanTripPage(navController: NavHostController) {
+    val context = LocalContext.current
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F5F5))
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text("Plan a New Trip", style = MaterialTheme.typography.headlineMedium)
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text("This is where the trip planning UI will go.", style = MaterialTheme.typography.bodyLarge)
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Button(onClick = { navController.popBackStack() }) {
+            Text("Back")
+        }
+    }
+}
+
+@Composable
+fun TrackExpensesPage(navController: NavHostController) {
+    val context = LocalContext.current
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F5F5))
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text("Track Expenses", style = MaterialTheme.typography.headlineMedium)
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text("This is where the expense tracking UI will go.", style = MaterialTheme.typography.bodyLarge)
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Button(onClick = { navController.popBackStack() }) {
+            Text("Back")
+        }
+    }
+}
+
+@Composable
+fun RemindersPage(navController: NavHostController) {
+    val context = LocalContext.current
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F5F5))
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text("Upcoming Reminders", style = MaterialTheme.typography.headlineMedium)
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text("This is where reminders UI will go.", style = MaterialTheme.typography.bodyLarge)
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Button(onClick = { navController.popBackStack() }) {
+            Text("Back")
         }
     }
 }
