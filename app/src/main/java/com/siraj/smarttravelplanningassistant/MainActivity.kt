@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.siraj.smarttravelplanningassistant
 
 import android.os.Bundle
@@ -5,10 +7,11 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -20,7 +23,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
@@ -28,6 +32,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
+import androidx.navigation.navArgument
 import com.siraj.smarttravelplanningassistant.ui.theme.SmartTravelPlanningAssistantTheme
 
 class MainActivity : ComponentActivity() {
@@ -57,6 +62,16 @@ class MainActivity : ComponentActivity() {
                         composable("signup") { SignUpPage(navController) }
                         composable("home") { HomeScreen(navController) }
                         composable("planTrip") { PlanTripPage(navController) }
+
+                        // New Trip Details page with destination as argument
+                        composable(
+                            "tripDetails/{destination}",
+                            arguments = listOf(navArgument("destination") { defaultValue = "Unknown" })
+                        ) { backStackEntry ->
+                            val destination = backStackEntry.arguments?.getString("destination") ?: "Unknown"
+                            TripDetailsPage(navController, destination)
+                        }
+
                         composable("trackExpenses") { TrackExpensesPage(navController) }
                         composable("reminders") { RemindersPage(navController) }
                     }
@@ -187,7 +202,15 @@ fun LoginPage(navController: NavHostController) {
 
         OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") }, singleLine = true, modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(12.dp))
-        OutlinedTextField(value = password, onValueChange = { password = it }, label = { Text("Password") }, singleLine = true, visualTransformation = PasswordVisualTransformation(), modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") },
+            singleLine = true,
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            modifier = Modifier.fillMaxWidth()
+        )
 
         Spacer(modifier = Modifier.height(20.dp))
         Button(onClick = {
@@ -225,9 +248,25 @@ fun SignUpPage(navController: NavHostController) {
 
         OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") }, singleLine = true, modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.height(12.dp))
-        OutlinedTextField(value = password, onValueChange = { password = it }, label = { Text("Password") }, singleLine = true, visualTransformation = PasswordVisualTransformation(), modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") },
+            singleLine = true,
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            modifier = Modifier.fillMaxWidth()
+        )
         Spacer(modifier = Modifier.height(12.dp))
-        OutlinedTextField(value = confirmPassword, onValueChange = { confirmPassword = it }, label = { Text("Confirm Password") }, singleLine = true, visualTransformation = PasswordVisualTransformation(), modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(
+            value = confirmPassword,
+            onValueChange = { confirmPassword = it },
+            label = { Text("Confirm Password") },
+            singleLine = true,
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            modifier = Modifier.fillMaxWidth()
+        )
 
         Spacer(modifier = Modifier.height(20.dp))
         Button(onClick = {
@@ -244,47 +283,237 @@ fun SignUpPage(navController: NavHostController) {
     }
 }
 
+// New data class for destinations
+data class Destination(val name: String)
+
+// Updated PlanTripPage to show destination cards
 @Composable
 fun PlanTripPage(navController: NavHostController) {
+    val destinations = listOf(
+        Destination("Japan"),
+        Destination("Korea"),
+        Destination("Thailand"),
+        Destination("Australia"),
+        Destination("New Zealand")
+    )
+
     Column(
-        modifier = Modifier.fillMaxSize().background(Color(0xFFF5F5F5)).padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F5F5))
+            .padding(16.dp)
     ) {
-        Text("Plan a New Trip", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(20.dp))
-        Text("This is where the trip planning UI will go.", style = MaterialTheme.typography.bodyLarge)
-        Spacer(modifier = Modifier.height(20.dp))
-        Button(onClick = { navController.popBackStack() }) { Text("Back") }
+        Text("Select Your Destination", style = MaterialTheme.typography.headlineMedium)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            items(destinations) { destination ->
+                DestinationCard(destination = destination) {
+                    navController.navigate("tripDetails/${destination.name}")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DestinationCard(destination: Destination, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(120.dp)
+            .clickable { onClick() },
+        elevation = CardDefaults.cardElevation(6.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                destination.name,
+                style = MaterialTheme.typography.headlineSmall,
+                color = Color(0xFF7B1FA2)
+            )
+        }
+    }
+}
+
+// Trip details page with booking form
+@Composable
+fun TripDetailsPage(navController: NavHostController, destination: String) {
+    val context = LocalContext.current
+
+    var tripName by remember { mutableStateOf("") }
+    var startDate by remember { mutableStateOf("") }
+    var endDate by remember { mutableStateOf("") }
+    var travelers by remember { mutableStateOf("") }
+    var notes by remember { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F5F5))
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("Plan your trip to $destination", style = MaterialTheme.typography.headlineMedium)
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = tripName,
+            onValueChange = { tripName = it },
+            label = { Text("Trip Name") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = startDate,
+            onValueChange = { startDate = it },
+            label = { Text("Start Date (YYYY-MM-DD)") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = endDate,
+            onValueChange = { endDate = it },
+            label = { Text("End Date (YYYY-MM-DD)") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = travelers,
+            onValueChange = { travelers = it },
+            label = { Text("Number of Travelers") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = notes,
+            onValueChange = { notes = it },
+            label = { Text("Additional Notes") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                Toast.makeText(
+                    context,
+                    "Trip '$tripName' to $destination booked successfully!",
+                    Toast.LENGTH_LONG
+                ).show()
+                navController.popBackStack()
+            },
+            enabled = tripName.isNotBlank() && startDate.isNotBlank() && endDate.isNotBlank() && travelers.isNotBlank(),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Book Trip")
+        }
     }
 }
 
 @Composable
 fun TrackExpensesPage(navController: NavHostController) {
-    Column(
-        modifier = Modifier.fillMaxSize().background(Color(0xFFF5F5F5)).padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text("Track Expenses", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(20.dp))
-        Text("This is where the expense tracking UI will go.", style = MaterialTheme.typography.bodyLarge)
-        Spacer(modifier = Modifier.height(20.dp))
-        Button(onClick = { navController.popBackStack() }) { Text("Back") }
-    }
+    val expenses = remember { mutableStateListOf<Expense>() }
+    var title by remember { mutableStateOf("") }
+    var amount by remember { mutableStateOf("") }
+
+    // Calculate total expenses
+    val totalAmount = expenses.sumOf { it.amount }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text("Track Expenses") })
+        },
+        content = { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(16.dp)
+            ) {
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text("Title") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = amount,
+                    onValueChange = { amount = it },
+                    label = { Text("Amount") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    onClick = {
+                        if (title.isNotBlank() && amount.isNotBlank()) {
+                            expenses.add(Expense(title, amount.toDoubleOrNull() ?: 0.0))
+                            title = ""
+                            amount = ""
+                        }
+                    },
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Text("Add Expense")
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "Total Expenses: $${"%.2f".format(totalAmount)}",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+
+                LazyColumn {
+                    items(expenses) { expense ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            elevation = CardDefaults.cardElevation(4.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(expense.title)
+                                Text("$${"%.2f".format(expense.amount)}")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    )
 }
+
+data class Expense(val title: String, val amount: Double)
 
 @Composable
 fun RemindersPage(navController: NavHostController) {
     Column(
-        modifier = Modifier.fillMaxSize().background(Color(0xFFF5F5F5)).padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F5F5))
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text("Upcoming Reminders", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(20.dp))
-        Text("This is where reminders UI will go.", style = MaterialTheme.typography.bodyLarge)
-        Spacer(modifier = Modifier.height(20.dp))
-        Button(onClick = { navController.popBackStack() }) { Text("Back") }
+        Text("Reminder feature coming soon!", style = MaterialTheme.typography.bodyLarge)
     }
 }
