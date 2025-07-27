@@ -34,6 +34,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import com.siraj.smarttravelplanningassistant.ui.theme.SmartTravelPlanningAssistantTheme
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.ui.res.painterResource
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -283,18 +287,20 @@ fun SignUpPage(navController: NavHostController) {
     }
 }
 
-// New data class for destinations
-data class Destination(val name: String)
-
-// Updated PlanTripPage to show destination cards
+data class Destination(val name: String, val imageRes: Int, val summary: String)
 @Composable
 fun PlanTripPage(navController: NavHostController) {
     val destinations = listOf(
-        Destination("Japan"),
-        Destination("Korea"),
-        Destination("Thailand"),
-        Destination("Australia"),
-        Destination("New Zealand")
+        Destination("Japan", R.drawable.japan, "Explore Tokyo, Kyoto, and cherry blossoms."),
+        Destination("South Korea", R.drawable.southkorea, "Visit Seoul, Busan, and historical palaces."),
+        Destination("Australia", R.drawable.australia, "Enjoy Sydney, Great Barrier Reef, and wildlife."),
+        Destination("New Zealand", R.drawable.newzealand, "Adventure in Queenstown, Rotorua, and mountains."),
+        Destination("Singapore", R.drawable.singapore, "Discover Marina Bay Sands and vibrant city life."),
+        Destination("USA", R.drawable.usa, "Explore New York, LA, and national parks."),
+        Destination("Italy", R.drawable.italy, "Visit Rome, Venice, and enjoy pasta and art."),
+        Destination("Canada", R.drawable.canada, "Experience Toronto, Vancouver, and nature wonders."),
+        Destination("United Kingdom", R.drawable.uk, "London, history, and countryside beauty."),
+        Destination("Mexico", R.drawable.mexico, "Beaches, tacos, and ancient ruins await.")
     )
 
     Column(
@@ -303,49 +309,62 @@ fun PlanTripPage(navController: NavHostController) {
             .background(Color(0xFFF5F5F5))
             .padding(16.dp)
     ) {
-        Text("Select Your Destination", style = MaterialTheme.typography.headlineMedium)
+        Text("Choose Your Destination", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(16.dp))
 
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(destinations) { destination ->
-                DestinationCard(destination = destination) {
-                    navController.navigate("tripDetails/${destination.name}")
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            content = {
+                items(destinations) { destination ->
+                    DestinationGridCard(destination = destination) {
+                        navController.navigate("tripDetails/${destination.name}")
+                    }
                 }
             }
-        }
+        )
     }
 }
 
 @Composable
-fun DestinationCard(destination: Destination, onClick: () -> Unit) {
+fun DestinationGridCard(destination: Destination, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp)
+            .height(220.dp)
             .clickable { onClick() },
-        elevation = CardDefaults.cardElevation(6.dp),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        elevation = CardDefaults.cardElevation(6.dp)
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
+        Column {
+            Image(
+                painter = painterResource(id = destination.imageRes),
+                contentDescription = destination.name,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 destination.name,
-                style = MaterialTheme.typography.headlineSmall,
-                color = Color(0xFF7B1FA2)
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+            Text(
+                destination.summary,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
             )
         }
     }
 }
 
-// Trip details page with booking form
+// Updated TripDetailsPage - Removed Trip Name field
 @Composable
 fun TripDetailsPage(navController: NavHostController, destination: String) {
     val context = LocalContext.current
 
-    var tripName by remember { mutableStateOf("") }
     var startDate by remember { mutableStateOf("") }
     var endDate by remember { mutableStateOf("") }
     var travelers by remember { mutableStateOf("") }
@@ -360,14 +379,6 @@ fun TripDetailsPage(navController: NavHostController, destination: String) {
     ) {
         Text("Plan your trip to $destination", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = tripName,
-            onValueChange = { tripName = it },
-            label = { Text("Trip Name") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedTextField(
             value = startDate,
@@ -406,12 +417,12 @@ fun TripDetailsPage(navController: NavHostController, destination: String) {
             onClick = {
                 Toast.makeText(
                     context,
-                    "Trip '$tripName' to $destination booked successfully!",
+                    "Trip to $destination booked successfully!",
                     Toast.LENGTH_LONG
                 ).show()
                 navController.popBackStack()
             },
-            enabled = tripName.isNotBlank() && startDate.isNotBlank() && endDate.isNotBlank() && travelers.isNotBlank(),
+            enabled = startDate.isNotBlank() && endDate.isNotBlank() && travelers.isNotBlank(),
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Book Trip")
