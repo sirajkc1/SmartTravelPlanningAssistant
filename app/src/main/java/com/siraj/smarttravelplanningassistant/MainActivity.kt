@@ -525,10 +525,55 @@ fun TripDetailsScreen(
 
 @Composable
 fun TrackExpensesScreen(navController: NavHostController) {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Track Expenses - Coming Soon")
+    var accommodation by remember { mutableStateOf(0.0) }
+    var food by remember { mutableStateOf(0.0) }
+    var transport by remember { mutableStateOf(0.0) }
+    var other by remember { mutableStateOf(0.0) }
+    val total = accommodation + food + transport + other
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("Track Your Expenses", style = MaterialTheme.typography.headlineMedium)
+        Spacer(Modifier.height(16.dp))
+
+        ExpenseInputField("Accommodation", accommodation) { accommodation = it }
+        ExpenseInputField("Food", food) { food = it }
+        ExpenseInputField("Transport", transport) { transport = it }
+        ExpenseInputField("Other", other) { other = it }
+
+        Spacer(Modifier.height(24.dp))
+
+        Text("Total Expenses: $${"%.2f".format(total)}", style = MaterialTheme.typography.titleLarge)
+        Spacer(Modifier.height(24.dp))
+
+        Button(onClick = { navController.popBackStack() }) {
+            Text("Done")
+        }
     }
 }
+
+@Composable
+fun ExpenseInputField(label: String, value: Double, onValueChange: (Double) -> Unit) {
+    var text by remember { mutableStateOf(value.toString()) }
+
+    OutlinedTextField(
+        value = text,
+        onValueChange = {
+            text = it
+            onValueChange(it.toDoubleOrNull() ?: 0.0)
+        },
+        label = { Text(label) },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    )
+}
+
 
 @Composable
 fun RemindersScreen(navController: NavHostController) {
