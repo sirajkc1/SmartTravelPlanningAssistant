@@ -16,3 +16,10 @@ An Android app built using **Kotlin**, **Jetpack Compose**, **Room**, and **MVVM
 - Coroutine + StateFlow
 - Android Architecture Components
 
+This app is built and tested using the following Android SDK versions:
+
+compileSdkVersion: 35 (Android 14)
+
+targetSdkVersion: 35 (Android 14)
+
+minSdkVersion: 24 (Android 7.0 Nougat)
