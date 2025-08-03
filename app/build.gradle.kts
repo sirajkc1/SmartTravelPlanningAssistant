@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("kotlin-kapt") // Required for Room
+    id("kotlin-kapt") // Required for Room annotation processing
 }
 
 android {
@@ -48,39 +48,41 @@ android {
 }
 
 dependencies {
-    // Jetpack Compose + Material
+    // Core Android dependencies
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+
+    // Jetpack Compose BOM and UI
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-    // Navigation for Compose
+    // Navigation Compose
     implementation("androidx.navigation:navigation-compose:2.7.3")
 
-    // Material Icons (optional)
+    // Material Icons Extended
     implementation("androidx.compose.material:material-icons-extended:1.4.3")
 
-    // ROOM (Database)
+    // Room components
     implementation("androidx.room:room-runtime:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
 
-    // ViewModel & Lifecycle for Compose
+    // Lifecycle & ViewModel Compose
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
 
-    // Coroutines (Kotlin)
+    // Kotlin Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
-    // (Optional) LiveData support
+    // LiveData (optional)
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
 
-    // Unit Testing
+    // Unit testing
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     testImplementation("app.cash.turbine:turbine:1.0.0")
@@ -92,7 +94,16 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
 
-    // Debug tools
+    // Room testing library for in-memory DB tests
+    androidTestImplementation("androidx.room:room-testing:2.6.1")
+
+    // Kotlin test assertions for Android instrumented tests
+    androidTestImplementation("org.jetbrains.kotlin:kotlin-test:1.8.22")
+
+    // AndroidX Test Core utilities
+    androidTestImplementation("androidx.test:core:1.5.0")
+
+    // Debug tooling for Compose previews and test manifests
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
