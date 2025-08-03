@@ -318,7 +318,7 @@ fun HomeScreen(navController: NavHostController, userViewModel: UserViewModel) {
         }
         Spacer(Modifier.height(20.dp))
 
-        Text("Welcome back!", style = MaterialTheme.typography.titleLarge, color = Color.White)
+        Text("Welcome!", style = MaterialTheme.typography.titleLarge, color = Color.White)
 
         Spacer(Modifier.height(24.dp))
 
