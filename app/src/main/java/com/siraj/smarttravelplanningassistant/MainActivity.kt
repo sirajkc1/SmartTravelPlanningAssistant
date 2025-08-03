@@ -87,7 +87,7 @@ class MainActivity : ComponentActivity() {
                             HomeScreen(navController, userViewModel)
                         }
                         composable("planTrip") {
-                            PlanTripScreen(navController, tripViewModel)
+                            PlanTripScreen(navController)
                         }
                         composable(
                             "tripDetails/{destination}",
@@ -100,7 +100,7 @@ class MainActivity : ComponentActivity() {
                             TrackExpensesScreen(navController)
                         }
                         composable("reminders") {
-                            RemindersScreen(navController)
+                            RemindersScreen()
                         }
                     }
                 }
@@ -139,7 +139,7 @@ data class NavBarItem(val route: String, val label: String, val icon: ImageVecto
 
 @Composable
 fun LoginScreen(navController: NavHostController, userViewModel: UserViewModel) {
-    val context = LocalContext.current
+    LocalContext.current
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val errorMessage by userViewModel.errorMessage.collectAsState()
@@ -370,12 +370,12 @@ fun FeatureCard(title: String, icon: ImageVector, onClick: () -> Unit) {
 data class Destination(val name: String, val imageRes: Int, val summary: String)
 
 @Composable
-fun PlanTripScreen(navController: NavHostController, tripViewModel: TripViewModel) {
+fun PlanTripScreen(navController: NavHostController) {
     val destinations = listOf(
         Destination("Japan", R.drawable.japan, "Explore Tokyo, Kyoto, and cherry blossoms."),
-        Destination("South Korea", R.drawable.southkorea, "Visit Seoul, Busan, and historical palaces."),
+        Destination("South Korea", R.drawable.southkorea, "Visit Seoul, Bus an, and historical palaces."),
         Destination("Australia", R.drawable.australia, "Enjoy Sydney, Great Barrier Reef, and wildlife."),
-        Destination("New Zealand", R.drawable.newzealand, "Adventure in Queenstown, Rotorua, and mountains."),
+        Destination("New Zealand", R.drawable.newzealand, "Adventure in Queenstown, Rotor, and mountains."),
         Destination("Singapore", R.drawable.singapore, "Discover Marina Bay Sands and vibrant city life."),
         Destination("USA", R.drawable.usa, "Explore New York, LA, and national parks."),
         Destination("Italy", R.drawable.italy, "Visit Rome, Venice, and enjoy pasta and art."),
@@ -525,10 +525,10 @@ fun TripDetailsScreen(
 
 @Composable
 fun TrackExpensesScreen(navController: NavHostController) {
-    var accommodation by remember { mutableStateOf(0.0) }
-    var food by remember { mutableStateOf(0.0) }
-    var transport by remember { mutableStateOf(0.0) }
-    var other by remember { mutableStateOf(0.0) }
+    var accommodation by remember { mutableDoubleStateOf(0.0) }
+    var food by remember { mutableDoubleStateOf(0.0) }
+    var transport by remember { mutableDoubleStateOf(0.0) }
+    var other: Double by remember { mutableDoubleStateOf(0.0) }
     val total = accommodation + food + transport + other
 
     Column(
@@ -576,7 +576,7 @@ fun ExpenseInputField(label: String, value: Double, onValueChange: (Double) -> U
 
 
 @Composable
-fun RemindersScreen(navController: NavHostController) {
+fun RemindersScreen() {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text("Reminders - Coming Soon")
     }
