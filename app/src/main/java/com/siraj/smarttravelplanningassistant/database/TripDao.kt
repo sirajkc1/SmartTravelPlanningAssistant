@@ -1,4 +1,4 @@
-package com.siraj.smarttravelplanningassistant.data
+package com.siraj.smarttravelplanningassistant.database
 
 import androidx.room.Dao
 import androidx.room.Insert

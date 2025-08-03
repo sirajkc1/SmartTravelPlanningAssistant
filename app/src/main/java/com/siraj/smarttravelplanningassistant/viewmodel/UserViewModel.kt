@@ -2,7 +2,7 @@ package com.siraj.smarttravelplanningassistant.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.siraj.smarttravelplanningassistant.data.User
+import com.siraj.smarttravelplanningassistant.database.User
 import com.siraj.smarttravelplanningassistant.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

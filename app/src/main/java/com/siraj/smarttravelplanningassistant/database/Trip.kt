@@ -1,4 +1,4 @@
-package com.siraj.smarttravelplanningassistant.data
+package com.siraj.smarttravelplanningassistant.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

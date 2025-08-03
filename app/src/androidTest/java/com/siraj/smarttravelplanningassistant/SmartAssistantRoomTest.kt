@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.siraj.smarttravelplanningassistant.data.AppDatabase
-import com.siraj.smarttravelplanningassistant.data.Trip
-import com.siraj.smarttravelplanningassistant.data.TripDao
+import com.siraj.smarttravelplanningassistant.database.AppDatabase
+import com.siraj.smarttravelplanningassistant.database.Trip
+import com.siraj.smarttravelplanningassistant.database.TripDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After

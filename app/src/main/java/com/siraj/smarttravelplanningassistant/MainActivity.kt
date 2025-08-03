@@ -35,9 +35,9 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
-import com.siraj.smarttravelplanningassistant.data.AppDatabase
-import com.siraj.smarttravelplanningassistant.data.Trip
-import com.siraj.smarttravelplanningassistant.data.User
+import com.siraj.smarttravelplanningassistant.database.AppDatabase
+import com.siraj.smarttravelplanningassistant.database.Trip
+import com.siraj.smarttravelplanningassistant.database.User
 import com.siraj.smarttravelplanningassistant.repository.TripRepository
 import com.siraj.smarttravelplanningassistant.repository.UserRepository
 import com.siraj.smarttravelplanningassistant.ui.theme.SmartTravelPlanningAssistantTheme

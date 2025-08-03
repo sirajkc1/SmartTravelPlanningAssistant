@@ -1,7 +1,7 @@
 package com.siraj.smarttravelplanningassistant.repository
 
-import com.siraj.smarttravelplanningassistant.data.User
-import com.siraj.smarttravelplanningassistant.data.UserDao
+import com.siraj.smarttravelplanningassistant.database.User
+import com.siraj.smarttravelplanningassistant.database.UserDao
 
 class UserRepository(private val userDao: UserDao) {
     suspend fun registerUser(user: User): Boolean {

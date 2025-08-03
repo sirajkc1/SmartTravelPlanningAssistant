@@ -1,7 +1,7 @@
 package com.siraj.smarttravelplanningassistant.repository
 
-import com.siraj.smarttravelplanningassistant.data.Trip
-import com.siraj.smarttravelplanningassistant.data.TripDao
+import com.siraj.smarttravelplanningassistant.database.Trip
+import com.siraj.smarttravelplanningassistant.database.TripDao
 
 class TripRepository(private val tripDao: TripDao) {
     suspend fun addTrip(trip: Trip) {
