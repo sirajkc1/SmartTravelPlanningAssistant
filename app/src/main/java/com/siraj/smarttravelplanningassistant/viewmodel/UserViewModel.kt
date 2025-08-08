@@ -57,7 +57,6 @@ class UserViewModel(private val repository: UserRepository) : ViewModel() {
 
     fun getCurrentUserEmail(): String? = currentUserEmail
 
-    // Call this after handling signup success to reset the flag
     fun resetSignupSuccess() {
         _signupSuccess.value = false
     }

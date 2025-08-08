@@ -106,4 +106,5 @@ dependencies {
     // Debug tooling for Compose previews and test manifests
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
 }
